@@ -22,7 +22,7 @@ public class chatServer extends JFrame {
 	private static List<Socket> list = new ArrayList<Socket>();
     private ExecutorService exec;
     
-    //创建一个服务器
+    //初始化，创建一个服务器
 	public chatServer(){
 		setLayout(new BorderLayout());
 		add(new JScrollPane(jta),BorderLayout.CENTER);
