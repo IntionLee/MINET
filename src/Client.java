@@ -94,7 +94,6 @@ public class Client {
      if return 2, the Server send a p2p message
      if return 3, the Server send a online user list
      if return 4, the Server send a clientname of this client*/
-    //public String input() {
     public int input() {
         int flag = 0;
         String str = "";
@@ -155,7 +154,6 @@ public class Client {
             e.printStackTrace();
         }
         return flag;
-        //return str;
     }
 
     /*return the massage which send to Client*/
