@@ -1,3 +1,4 @@
+
 import java.awt.BorderLayout;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -40,6 +41,8 @@ public class chatServer extends JFrame {
  				client = server.accept();
  				//添加到已连接客户端列表
  				list.add(client);
+ 				//当有用户上线，向每个用户发送新的用户列表
+ 				sendNewList();
  				//为客户端创建一个线程
  				exec.execute(new Task(client));
  			}
@@ -55,6 +58,22 @@ public class chatServer extends JFrame {
 				System.out.println("Error closing");
 				ie.printStackTrace();
 			}		
+		}
+	}
+	
+	//新用户上线，向在线的每个用户返回新的用户列表
+	public void sendNewList() throws IOException {
+		//返回在线用户列表
+		String sendList = "request:list";
+		int num = list.size();
+		sendList += num + "\n";
+		for(Socket client:list){
+			sendList += "["+client.getInetAddress()+"]" + "["+client.getPort()+"]" + "\n";				
+		}
+		for(Socket client:list){
+			DataOutputStream toclient;
+			toclient= new DataOutputStream(client.getOutputStream());
+			toclient.writeUTF(sendList);
 		}
 	}
 	
@@ -109,6 +128,7 @@ public class chatServer extends JFrame {
 			toclient= new DataOutputStream(client.getOutputStream());
 			toclient.writeUTF(message);
 		}
+		
 		public void sendMessageToOne() throws IOException {
 			String message = msg;
 			message = message.replace("flag:2", "");
@@ -164,7 +184,11 @@ public class chatServer extends JFrame {
 				       --i;
 				  }  
 			}
-			sendClientList();
+			try {
+			    sendClientList();
+			} catch(IOException e) {
+				System.out.println("Error when sending new userlist because " + client + "is closed");
+			}
 			try {
 				//关闭连接
 				client.close();
