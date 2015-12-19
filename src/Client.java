@@ -1,3 +1,5 @@
+package src;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -9,7 +11,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 
-class Client {
+public class Client {
     private Socket socket;
     private DataOutputStream output_;
     private DataInputStream input_;
