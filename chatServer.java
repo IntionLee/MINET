@@ -1,4 +1,3 @@
-
 import java.awt.BorderLayout;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -61,8 +60,8 @@ public class chatServer extends JFrame {
 		}
 	}
 	
-	//新用户上线，向在线的每个用户返回新的用户列表
-	public void sendNewList() throws IOException {
+	//新用户上线或者有用户下线时，向在线的每个用户返回新的用户列表
+	static public void sendNewList() throws IOException {
 		//返回在线用户列表
 		String sendList = "request:list";
 		int num = list.size();
@@ -185,7 +184,8 @@ public class chatServer extends JFrame {
 				  }  
 			}
 			try {
-			    sendClientList();
+				//需要向其他在线的用户发送新的用户列表
+			    sendNewList();
 			} catch(IOException e) {
 				System.out.println("Error when sending new userlist because " + client + "is closed");
 			}
