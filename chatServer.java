@@ -22,25 +22,25 @@ public class chatServer extends JFrame {
 	private static List<Socket> list = new ArrayList<Socket>();
     private ExecutorService exec;
     
-    //´´½¨Ò»¸ö·þÎñÆ÷
+    //创建一个服务器
 	public chatServer(){
 		setLayout(new BorderLayout());
 		add(new JScrollPane(jta),BorderLayout.CENTER);
-		setTitle("ÁÄÌìÊÒ·þÎñÆ÷");
+		setTitle("聊天室服务器");
 		setSize(500,300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		try{
  			server = new ServerSocket(54321);
  			exec = Executors.newCachedThreadPool();
- 			jta.append("·þÎñÆ÷ÒÑ¾­Æô¶¯\n");
+ 			jta.append("服务器已经启动\n");
  			Socket client = null;
- 			//Ò»Ö±¼àÌýÊÇ·ñÓÐÐÂµÄ¿Í»§¶ËÒªÇóÁ¬½Ó
+ 			//一直监听是否有新的客户端要求连接
  			while(true){
  				client = server.accept();
- 				//Ìí¼Óµ½ÒÑÁ¬½Ó¿Í»§¶ËÁÐ±í
+ 				//添加到已连接客户端列表
  				list.add(client);
- 				//Îª¿Í»§¶Ë´´½¨Ò»¸öÏß³Ì
+ 				//为客户端创建一个线程
  				exec.execute(new Task(client));
  			}
 		} catch(Exception e){
@@ -63,8 +63,8 @@ public class chatServer extends JFrame {
         private DataInputStream fromclient;
         private DataOutputStream toclient;
         String msg;
-        String ipAddress;//¼ÇÂ¼¿Í»§¶ËµÄip
-        int port;//¼ÇÂ¼¿Í»§¶ËµÄ¶Ë¿Ú
+        String ipAddress;//记录客户端的ip
+        int port;//记录客户端的端口
         
 		public Task(Socket client) throws IOException{
   			this.client = client;
@@ -73,12 +73,12 @@ public class chatServer extends JFrame {
 		
 		public void run() {
 			try{
-				//Ò»Ö±¼àÌý¿Í»§¶ËÊÇ·ñÓÐ·¢ËÍÏûÏ¢
+				//一直监听客户端是否有发送消息
 				while((msg=fromclient.readUTF())!=null){
 					ipAddress = client.getInetAddress().toString();
                     port =  client.getPort();
 					jta.append(msg+"\n");
-					//ÅÐ¶Ï¿Í»§¶Ë·¢ËÍµÄÏûÏ¢ÊÇÄÄÕÅÀàÐÍµÄÏûÏ¢
+					//判断客户端发送的消息是哪张类型的消息
 					judeMessage(msg);
 				}
 			}catch(Exception e){
@@ -112,7 +112,7 @@ public class chatServer extends JFrame {
 		public void sendMessageToOne() throws IOException {
 			String message = msg;
 			message = message.replace("flag:2", "");
-			//·¢¸øP2PµÄÁíÒ»·½
+			//发给P2P的另一方
 			for (Socket client:list) {
 				if (message.startsWith("["+client.getInetAddress()+"]" + "["+client.getPort()+"]")) {
 					message = message.replace("["+client.getInetAddress()+"]" + "["+client.getPort()+"]", "");
@@ -122,7 +122,7 @@ public class chatServer extends JFrame {
 					jta.append("p2p:" + message+"\n");
 				}
 			}
-			//·¢¸ø×Ô¼º£¬messageÒÑ¾­´¦ÀíºÃ£¬Ö±½Ó·¢ËÍ
+			//发给自己，message已经处理好，直接发送
 			/*for (Socket client:list) {
 			    if (client.getInetAddress().toString().equals(ipAddress) && client.getPort()== port) {
 			    	toclient= new DataOutputStream(client.getOutputStream());
@@ -132,7 +132,7 @@ public class chatServer extends JFrame {
 		}
 		
 		public void sendMessageToAll() throws IOException {
-			//ÈºÁÄ Ã¿Ò»¸ö¶¼·¢ËÍ
+			//群聊 每一个都发送
 			for(Socket client:list){
 				toclient= new DataOutputStream(client.getOutputStream());
 				String message = msg;
@@ -143,7 +143,7 @@ public class chatServer extends JFrame {
 		}
 		
 		public void sendClientList() throws IOException {
-			//·µ»ØÔÚÏßÓÃ»§ÁÐ±í
+			//返回在线用户列表
 			String sendList = "request:list";
 			int num = list.size();
 			sendList += num + "\n";
@@ -164,8 +164,9 @@ public class chatServer extends JFrame {
 				       --i;
 				  }  
 			}
+			sendClientList();
 			try {
-				//¹Ø±ÕÁ¬½Ó
+				//关闭连接
 				client.close();
 			} catch (IOException ie) {
 				System.out.println("Error closing " + client);
