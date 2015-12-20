@@ -121,6 +121,76 @@ public class chatServer extends JFrame {
 			} else if (message.startsWith("request:clientname")) {
 				//ask for the client's name
 				sendClientName();
+			} else if (message.startsWith("file_")) {
+				message = message.replace("file_", "");
+				if (message.startsWith("flag:1")) {
+					//send the file to all users
+					sendFileToAll(message);			
+				} else if (message.startsWith("flag:2")) {
+					//send the file to one user
+					sendFileToOne(message);
+				}
+			}
+		}
+		
+		
+		//群聊 每一个都发送文件
+		public void sendFileToAll(String message) throws IOException {
+			message = message.replace("flag:1","");
+			
+			//根据换行符查找到文件长度开始的地方
+			int index = message.indexOf("\n");
+			//读取存储表示文件长度的子字符串
+			String len = message.substring(index+1, message.length());
+			long file_length = Long.parseLong(len);
+			double file_loop = file_length/1024.0;
+			file_loop = Math.ceil(file_loop);//需要读字节循环的次数
+			jta.append("file_length" + file_length + "file_loop"+ file_loop+ "\n");//打印提示文件长度
+			
+			byte[] inputByte = new byte[1024];
+			//先循环发送第一条通知消息
+			for(Socket client:list){
+				toclient= new DataOutputStream(client.getOutputStream());
+				message = "file_flag:1" + "["+ipAddress+"]" + "["+port+"]" + message;
+				toclient.writeUTF(message);
+				jta.append(message+"\n");
+			}
+			
+			//再边读边循环发送给每个客户端
+			for (long i = 0; i < file_loop; i++) {
+				int length = fromclient.read(inputByte, 0, inputByte.length);
+				for(Socket client:list) {
+					toclient= new DataOutputStream(client.getOutputStream());
+					toclient.write(inputByte, 0, length);
+				}
+			}
+		}
+		
+		public void sendFileToOne(String message) throws IOException {
+			message = message.replace("flag:2", "");
+			
+			int index = message.indexOf("\n");
+			//读取存储表示文件长度的子字符串
+			String len = message.substring(index+1, message.length());
+			long file_length = Long.parseLong(len);
+			double file_loop = file_length/1024.0;
+			file_loop = Math.ceil(file_loop);//需要读字节循环的次数
+			jta.append("file_length" + file_length + "file_loop"+ file_loop+ "\n");//打印提示文件长度
+			
+			byte[] inputByte = new byte[1024]; 
+			//发给P2P的另一方
+			for (Socket client:list) {
+				if (message.startsWith("["+client.getInetAddress()+"]" + "["+client.getPort()+"]")) {
+					message = message.replace("["+client.getInetAddress()+"]" + "["+client.getPort()+"]", "");
+					toclient= new DataOutputStream(client.getOutputStream());
+					message = "file_flag:2" + "["+ipAddress+"]" + "["+port+"]" + message;
+					toclient.writeUTF(message);
+					for (long i = 0; i < file_loop; i++) {
+						int length = fromclient.read(inputByte, 0, inputByte.length);
+						toclient.write(inputByte, 0, length);   
+					}
+					jta.append("p2p:" + message+"\n");
+				}
 			}
 		}
 		
@@ -143,13 +213,6 @@ public class chatServer extends JFrame {
 					jta.append("p2p:" + message+"\n");
 				}
 			}
-			//发给自己，message已经处理好，直接发送
-			/*for (Socket client:list) {
-			    if (client.getInetAddress().toString().equals(ipAddress) && client.getPort()== port) {
-			    	toclient= new DataOutputStream(client.getOutputStream());
-					toclient.writeUTF(message);
-				}
-			}*/
 		}
 		
 		public void sendMessageToAll() throws IOException {
