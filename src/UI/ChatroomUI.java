@@ -27,7 +27,6 @@ public class ChatroomUI extends JFrame implements ComponentListener,
     private JScrollPane scrollChatWindow;
     private JTextArea inputDialog;
     private JScrollPane scrollInputDialog;
-    private JButton refreshBtn;
     private JButton sendBtn;
     private Client client;
 
@@ -74,7 +73,6 @@ public class ChatroomUI extends JFrame implements ComponentListener,
         
         chatWindow = new JTextArea();
         inputDialog = new JTextArea();
-        refreshBtn = new JButton("刷新用户列表");
         sendBtn = new JButton("发送");
     }
 
@@ -119,22 +117,6 @@ public class ChatroomUI extends JFrame implements ComponentListener,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollUserListWindow.setPreferredSize(new Dimension(180, 150));
         add(scrollUserListWindow, cLeft);
-    }
-
-    private void addRefreshButton() {
-        GridBagConstraints cRefreshButton = new GridBagConstraints();
-        cRefreshButton.weightx = 0;
-        cRefreshButton.weighty = 0.025;
-        cRefreshButton.insets = new Insets(10, 10, 10, 10);
-        cRefreshButton.fill = GridBagConstraints.NONE;
-        cRefreshButton.anchor = GridBagConstraints.EAST;
-
-        // add refresh button
-        cRefreshButton.gridx = 0;
-        cRefreshButton.gridy = 7;
-        cRefreshButton.gridwidth = 1;
-        cRefreshButton.gridheight = 1;
-        add(refreshBtn, cRefreshButton);
     }
 
     private void addChatWindow() {
@@ -200,13 +182,11 @@ public class ChatroomUI extends JFrame implements ComponentListener,
     private void initUI() {
         addHeader();
         addUserlistWindow();
-        addRefreshButton();
         addChatWindow();
         addInputDialogWindow();
         addSendButton();
 
         // add listener
-        refreshBtn.addActionListener(new refreshBtnListener());
         sendBtn.addActionListener(new sendBtnListener());
     }
 
@@ -228,9 +208,6 @@ public class ChatroomUI extends JFrame implements ComponentListener,
 
     public void appendPrivateChatWindowText(String chatWith) {
         userListWindow.getPrivateChatUI(chatWith).appendChatWindowText();
-            // JOptionPane.showConfirmDialog(this,
-            //     "您选择的用户已经下线，请刷新用户列表", "Tip",
-            //     JOptionPane.OK_CANCEL_OPTION);
     }
 
     @Override
@@ -249,6 +226,7 @@ public class ChatroomUI extends JFrame implements ComponentListener,
     public void windowClosing(WindowEvent arg0) {
             // TODO Auto-generated method stub
 
+        userListWindow.closePrivateChatWindows();
         client.close();
         dispose();
         System.exit(0);
@@ -297,13 +275,6 @@ public class ChatroomUI extends JFrame implements ComponentListener,
     public void componentShown(ComponentEvent arg0) {
             // TODO Auto-generated method stub
 
-    }
-
-    private class refreshBtnListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            client.requestUserlist();
-        }
     }
 
     private class sendBtnListener implements ActionListener {

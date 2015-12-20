@@ -7,7 +7,15 @@ public class newClient {
     private Client client;
 
     public newClient() {
-        client = new Client("localhost",54321);
+        LoginPara loginPara = new LoginPara();
+
+        LoginUI loginUI = new LoginUI(loginPara);
+        while (loginPara.getFlag()) {
+            System.out.print("");
+        }
+        
+        client = new Client(loginPara.getIp(),
+            loginPara.getPortNum());
         ChatroomUI ui = new ChatroomUI(client);
 
         while(true){
