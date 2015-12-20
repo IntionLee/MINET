@@ -51,11 +51,6 @@ public class UserListUI extends JPanel {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     Boolean flag = false;
-                    // client.requestUserlist();
-                    // System.out.println("finding1...");
-                    // client.input();
-                    // System.setIn(new ByteArrayInputStream("".getBytes()));
-                    // System.out.println("finding2...");
                     for (String user_ : client.getUserlist()) {
                         if (user_.equals(user.getText())) {
                             System.out.println("has this user");
@@ -77,6 +72,12 @@ public class UserListUI extends JPanel {
         }
     }
 
+    public void closePrivateChatWindows() {
+        for (PrivateChatUI ui : privateChatList.values()) {
+            ui.dispose();
+        }
+    }
+
     public void removeFromList(String chatWith) {
         privateChatList.put(chatWith, null);
     }
@@ -86,7 +87,6 @@ public class UserListUI extends JPanel {
         if (privateChatList.get(chatWith) == null) {
             PrivateChatUI pcUI = new PrivateChatUI(client,
                 chatWith, privateChatList);
-            // privateChatList.put(chatWith, pcUI);
             return pcUI;
         } else {
             return privateChatList.get(chatWith);

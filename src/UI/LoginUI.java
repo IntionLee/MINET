@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+import java.io.*;
+
 import src.*;
 
 /**
@@ -22,13 +24,13 @@ public class LoginUI extends JFrame {
     private JTextField inputUsername;
     private JTextField inputPassword;
     private JButton loginBtn;
-    private Client client;
+    private LoginPara loginPara;
 
-    public LoginUI(Client client_) {
+    public LoginUI(LoginPara loginPara_) {
         super("登录");
         setLayout(new GridBagLayout());
 
-        client = client_;
+        loginPara = loginPara_;
 
         labelUsername = new JLabel("ip");
         inputUsername = new JTextField();
@@ -138,22 +140,11 @@ public class LoginUI extends JFrame {
     private class loginBtnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // check if the ip address is localhost
-            // inputUsername.getText().toString().equals(
-            //     client.getSender())
-            if (true) {
-                getContentPane().removeAll();
-                
-                // setContentPane(new ChatroomUI(client));
-                setTitle("聊天室");
-                setSize(600, 600);
-                setResizable(true);
-                
-                validate();
-                repaint();
-            } else {
-                System.out.println("wrong ip!");
-            }
+            loginPara.setFlag(false);
+            loginPara.setIp(inputUsername.getText());
+            loginPara.setPortNum(Integer.parseInt(
+                inputPassword.getText().toString()));
+            dispose();
         }
     }
 }
