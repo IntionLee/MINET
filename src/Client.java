@@ -6,6 +6,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.io.File;  
+import java.io.FileInputStream;  
+import java.io.FileOutputStream; 
 
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -22,14 +25,35 @@ public class Client {
 
     /*constructor of Client
       connect to  Server*/
+    class Client {
+    private Socket socket;
+    private DataOutputStream output_;
+    private DataInputStream input_;
+    private FileInputStream input_file;
+    private FileOutputStream output_file;
+    private byte[] sendBytes;
+    private byte[] inputBytes;
+    private String message;
+    private String sender;
+    private String filename_;
+    private String clientname;
+    private ArrayList<String> userlist;
+
+    /*constructor of Client
+      connect to  Server*/
     public Client(String hostip, int port) {
         try {
             socket=new Socket(hostip, port);
             output_ = new DataOutputStream(socket.getOutputStream());
             input_ = new DataInputStream(socket.getInputStream());
+            input_file = null;
+            output_file = null;
+            sendBytes = null;
+            inputBytes = null;
             message = "";
             sender = "";
-            clientname= "";
+            clientname = "";
+            filename_ = "";
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -42,6 +66,31 @@ public class Client {
         try {
             output_.writeUTF("flag:1"+str);
             output_.flush();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*output a file to chatroom (all users)*/
+    public void output_file_to_chatroom(File file, String filename) {
+        try {
+            long l = file.length();
+            String l_ = String.valueOf(l);
+            output_.writeUTF("file_flag:1"+filename+'\n'+l_);
+            output_.flush();
+
+            int length = 0;
+            double sumL = 0;
+            input_file = new FileInputStream(file);
+            sendBytes = new byte[1024];
+            while ((length = input_file.read(sendBytes, 0, sendBytes.length)) > 0) {  
+                sumL += length;    
+                System.out.println("Transmit"+((sumL/l)*100)+"%");  
+                output_.write(sendBytes, 0, length);  
+                output_.flush();  
+            }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -87,14 +136,39 @@ public class Client {
         }
     }
 
+    /*output a file to the other user, this is a p2p output*/
+    public void output_file_to_p2p(String user, File file, String filename) {
+        try {
+            long l = file.length();
+            String l_ = String.valueOf(l);
+            output_.writeUTF("file_flag:2"+user+filename+"\n"+l_);
+            output_.flush();
+
+            int length = 0;
+            double sumL = 0;
+            input_file = new FileInputStream(file);
+            sendBytes = new byte[1024];
+            while ((length = input_file.read(sendBytes, 0, sendBytes.length)) > 0) {  
+                sumL += length;    
+                System.out.println("Transmit"+((sumL/l)*100)+"%");  
+                output_.write(sendBytes, 0, length);  
+                output_.flush();  
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /*The function just return flag value to tell UI the type of this input
      If UI wants to get the input message or sender or userlist
      it need to use function getmessage() and getSender() and getUserlist()
      if return 1, the Server send a chatroom message
      if return 2, the Server send a p2p message
      if return 3, the Server send a online user list
-     if return 4, the Server send a clientname of this client*/
-    //public String input() {
+     if return 4, the Server send a clientname of this client
+     if return 5, the Server send a file from others*/
     public int input() {
         int flag = 0;
         String str = "";
@@ -148,14 +222,99 @@ public class Client {
                 /*get clientname, store it as clientname*/
                 clientname = str.replace("request:clientname","");
                 flag = 4;
-            } 
+            }  else if (str.startsWith("file_flag:1")) {
+                /*get chatroom file,  store the sender as sender
+                    and store file at C:/MINET/ */
+                str = str.replace("file_flag:1","");
+                sender = "";
+                char[] str1 = str.toCharArray();
+                for(int i = 0, count = 0; count != 2; i++) {
+                    if(str1[i] == ']') {
+                        sender = sender+str1[i];
+                        count++;
+                    } else {
+                        sender = sender+str1[i];
+                    }
+                }
+                filename_ = "";
+                str = str.replace(sender,"");
+                str1 = str.toCharArray();
+                for(int i = 0; str1[i] != '\n'; i++) {
+                    filename_ = filename_+str1[i];
+                }
+                str = str.replace(filename_+"\n","");
+
+                int length = 0;
+                long l = Long.parseLong(str); 
+                File f = new File("C:/MINET"); 
+                if(!f.exists()){  
+                    f.mkdir();    
+                }
+
+                long cur = 0;
+                output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
+                inputBytes = new byte[1024];
+                while (true) {
+                    length = input_.read(inputBytes, 0, inputBytes.length);
+                    cur += length;
+                    output_file.write(inputBytes, 0, length);  
+                    output_file.flush(); 
+                    if (cur >= l) {
+                        output_file.close();
+                        break;
+                    }   
+                }
+                flag = 5;
+            } else if (str.startsWith("file_flag:2")) {
+                /*get p2p file from other user, store the sender as sender,
+                  and store file at C:/MINET/ */
+                str = str.replace("file_flag:2","");
+                sender = "";
+                char[] str1 = str.toCharArray();
+                for(int i = 0, count = 0; count != 2; i++) {
+                    if(str1[i] == ']') {
+                        sender = sender+str1[i];
+                        count++;
+                    } else {
+                        sender = sender+str1[i];
+                    }
+                }
+                filename_ = "";
+                str = str.replace(sender,"");
+                str1 = str.toCharArray();
+                for(int i = 0; str1[i] != '\n'; i++) {
+                    filename_ = filename_+str1[i];
+                }
+                str = str.replace(filename_+"\n","");
+
+                int length = 0;
+                long l = Long.parseLong(str); 
+                File f = new File("C:/MINET"); 
+                if(!f.exists()){  
+                    f.mkdir();    
+                }
+
+                long cur = 0;
+                output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
+                inputBytes = new byte[1024];
+                while (true) {
+                    length = input_.read(inputBytes, 0, inputBytes.length);
+                    cur += length;
+                    output_file.write(inputBytes, 0, length);  
+                    output_file.flush(); 
+                    if (cur >= l) {
+                        output_file.close();
+                        break;
+                    }   
+                }
+                flag = 5;
+            }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return flag;
-        //return str;
     }
 
     /*return the massage which send to Client*/

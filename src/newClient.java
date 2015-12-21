@@ -1,8 +1,7 @@
 package src;
-
 import src.UI.*;
 
-/*this is a test UI, it can be replaced*/
+/*this is a main function*/
 public class newClient {
 
     private Client client;
