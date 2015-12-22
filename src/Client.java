@@ -116,9 +116,9 @@ public class Client {
     /*output to the other user, this is a p2p output
       when call this function, you have to give who you want to send
       and what you want to send*/
-    public void output_to_p2p(String user, String str) {
+    public void output_to_p2p(String receiver, String str) {
         try {
-            output_.writeUTF("flag:2"+user+str);
+            output_.writeUTF("flag:2"+receiver+str);
             output_.flush();
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -128,11 +128,11 @@ public class Client {
     }
 
     /*output a file to the other user, this is a p2p output*/
-    public void output_file_to_p2p(String user, File file, String filename) {
+    public void output_file_to_p2p(String receiver, File file, String filename) {
         try {
             long l = file.length();
             String l_ = String.valueOf(l);
-            output_.writeUTF("file_flag:2"+user+filename+"\n"+l_);
+            output_.writeUTF("file_flag:2"+receiver+filename+"\n"+l_);
             output_.flush();
 
             int length = 0;
@@ -215,7 +215,7 @@ public class Client {
                 flag = 4;
             }  else if (str.startsWith("file_flag:1")) {
                 /*get chatroom file,  store the sender as sender
-                    and store file at C:/MINET/ */
+                    and store file at folder files */
                 str = str.replace("file_flag:1","");
                 sender = "";
                 char[] str1 = str.toCharArray();
@@ -238,7 +238,6 @@ public class Client {
                 int length = 0;
                 long l = Long.parseLong(str); 
 
-                // File f = new File("C:/MINET");
                 File directory = new File("..");
                 String path = directory.getCanonicalPath() + "/files";
                 File f = new File(path);
@@ -248,7 +247,6 @@ public class Client {
                 }
 
                 long cur = 0;
-                // output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
                 output_file = new FileOutputStream(new File(
                     path + "/" +filename_));
                 inputBytes = new byte[1024];
@@ -264,8 +262,8 @@ public class Client {
                 }
                 flag = 5;
             } else if (str.startsWith("file_flag:2")) {
-                /*get p2p file from other user, store the sender as sender,
-                  and store file at C:/MINET/ */
+                /*get chatroom file,  store the sender as sender
+                    and store file at folder files */
                 str = str.replace("file_flag:2","");
                 sender = "";
                 char[] str1 = str.toCharArray();
@@ -288,7 +286,6 @@ public class Client {
                 int length = 0;
                 long l = Long.parseLong(str); 
                 
-                // File f = new File("C:/MINET");
                 File directory = new File("..");
                 String path = directory.getCanonicalPath() + "/files";
                 File f = new File(path); 
@@ -298,7 +295,6 @@ public class Client {
                 }
 
                 long cur = 0;
-                // output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
                 output_file = new FileOutputStream(new File(
                     path + "/" +filename_));
                 inputBytes = new byte[1024];
