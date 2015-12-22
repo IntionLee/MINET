@@ -151,7 +151,7 @@ public class PrivateChatUI extends JFrame implements ComponentListener,
     }
 
     public void appendChatWindowText() {
-        chatWindow.append(chatWith + client.getMessage() + "\n");
+        chatWindow.append(chatWith + ": " + client.getMessage() + "\n");
     }
 
     @Override
