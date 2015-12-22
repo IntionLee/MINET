@@ -152,7 +152,9 @@ public class chatServer extends JFrame {
 			for(Socket client:list){
 				toclient= new DataOutputStream(client.getOutputStream());
 				message = "file_flag:1" + "["+ipAddress+"]" + "["+port+"]" + message;
-				toclient.writeUTF(message);
+				if (!(client.getInetAddress().toString().equals(ipAddress) && client.getPort() == port)) {
+					toclient.writeUTF(message);
+				}
 				jta.append(message+"\n");
 			}
 			
@@ -160,7 +162,7 @@ public class chatServer extends JFrame {
 			for (long i = 0; i < file_loop; i++) {
 				int length = fromclient.read(inputByte, 0, inputByte.length);
 				for(Socket client:list) {
-					if (client.getInetAddress().toString() != ipAddress && client.getPort() != port) {
+					if (!(client.getInetAddress().toString().equals(ipAddress) && client.getPort() == port)) {
 					    toclient= new DataOutputStream(client.getOutputStream());
 					    toclient.write(inputByte, 0, length);
 					}
