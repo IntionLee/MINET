@@ -160,8 +160,10 @@ public class chatServer extends JFrame {
 			for (long i = 0; i < file_loop; i++) {
 				int length = fromclient.read(inputByte, 0, inputByte.length);
 				for(Socket client:list) {
-					toclient= new DataOutputStream(client.getOutputStream());
-					toclient.write(inputByte, 0, length);
+					if (client.getInetAddress().toString() != ipAddress && client.getPort() != port) {
+					    toclient= new DataOutputStream(client.getOutputStream());
+					    toclient.write(inputByte, 0, length);
+					}
 				}
 			}
 		}
