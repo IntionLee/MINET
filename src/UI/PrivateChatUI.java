@@ -13,7 +13,7 @@ import java.util.*;
 import src.*;
 
 /**
- * provide the GUI of regist window
+ * provide the GUI of private chat window(p2p)
  *
  * @version 1.0 08 Dec 2015
  */
@@ -25,6 +25,7 @@ public class PrivateChatUI extends JFrame implements ComponentListener,
     private JTextArea inputDialog;
     private JScrollPane scrollInputDialog;
     private JButton sendBtn;
+    private JButton sendFileBtn;
     private Client client;
     private String chatWith;
     private HashMap<String, PrivateChatUI> privateChatList;
@@ -63,6 +64,7 @@ public class PrivateChatUI extends JFrame implements ComponentListener,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         
         sendBtn = new JButton("发送");
+        sendFileBtn = new JButton("选择文件");
     }
 
     private void initUI() {
@@ -130,6 +132,14 @@ public class PrivateChatUI extends JFrame implements ComponentListener,
         cButton.gridheight = 1;
         add(sendBtn, cButton);
 
+        // add send file button
+        cButton.weightx = 0.2;
+        cButton.gridx = 5;
+        cButton.gridy = 7;
+        cButton.gridwidth = 1;
+        cButton.gridheight = 1;
+        add(sendFileBtn, cButton);
+
         // set preferences for JFrame
         setSize(600, 600);
         setVisible(true);
@@ -137,6 +147,7 @@ public class PrivateChatUI extends JFrame implements ComponentListener,
 
         // add listener
         sendBtn.addActionListener(new sendBtnListener());
+        sendFileBtn.addActionListener(new sendFileBtnListener());
     }
 
     public void appendChatWindowText() {
@@ -213,14 +224,20 @@ public class PrivateChatUI extends JFrame implements ComponentListener,
     private class sendBtnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("send p2p");
-            String user = chatWith;
+            // send private message to person you are chatting with
             String str = inputDialog.getText().toString();
-            client.output_to_p2p(user, str);
+            client.output_to_p2p(chatWith, str);
 
             chatWindow.append("me: " + str + "\n");
 
             inputDialog.setText("");
+        }
+    }
+
+    private class sendFileBtnListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new FileChooserUI(client, 1, chatWith);
         }
     }
 }

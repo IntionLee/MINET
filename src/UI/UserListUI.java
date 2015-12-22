@@ -14,7 +14,7 @@ import java.io.*;
 import src.*;
 
 /**
- * provide the GUI of regist window
+ * provide the list of user(s) online
  *
  * @version 1.0 08 Dec 2015
  */
@@ -50,16 +50,7 @@ public class UserListUI extends JPanel {
             user.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    Boolean flag = false;
-                    for (String user_ : client.getUserlist()) {
-                        if (user_.equals(user.getText())) {
-                            System.out.println("has this user");
-                            flag = true;
-                            break;
-                        }
-                    }
-
-                    if (!user.getText().equals(client.getClientname()) && flag
+                    if (!user.getText().equals(client.getClientname())
                         && (privateChatList.get(user.getText()) == null)) {
                             new PrivateChatUI(client, user.getText(),
                                 privateChatList);
@@ -74,7 +65,9 @@ public class UserListUI extends JPanel {
 
     public void closePrivateChatWindows() {
         for (PrivateChatUI ui : privateChatList.values()) {
-            ui.dispose();
+            if (ui != null) {
+                ui.dispose();
+            }
         }
     }
 

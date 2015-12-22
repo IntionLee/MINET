@@ -15,17 +15,8 @@ import java.util.ArrayList;
 
 
 public class Client {
-    private Socket socket;
-    private DataOutputStream output_;
-    private DataInputStream input_;
-    private String message;
-    private String sender;
-    private String clientname;
-    private ArrayList<String> userlist;
-
     /*constructor of Client
       connect to  Server*/
-    class Client {
     private Socket socket;
     private DataOutputStream output_;
     private DataInputStream input_;
@@ -246,13 +237,20 @@ public class Client {
 
                 int length = 0;
                 long l = Long.parseLong(str); 
-                File f = new File("C:/MINET"); 
+
+                // File f = new File("C:/MINET");
+                File directory = new File("..");
+                String path = directory.getCanonicalPath() + "/files";
+                File f = new File(path);
+
                 if(!f.exists()){  
                     f.mkdir();    
                 }
 
                 long cur = 0;
-                output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
+                // output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
+                output_file = new FileOutputStream(new File(
+                    path + "/" +filename_));
                 inputBytes = new byte[1024];
                 while (true) {
                     length = input_.read(inputBytes, 0, inputBytes.length);
@@ -289,13 +287,20 @@ public class Client {
 
                 int length = 0;
                 long l = Long.parseLong(str); 
-                File f = new File("C:/MINET"); 
+                
+                // File f = new File("C:/MINET");
+                File directory = new File("..");
+                String path = directory.getCanonicalPath() + "/files";
+                File f = new File(path); 
+
                 if(!f.exists()){  
                     f.mkdir();    
                 }
 
                 long cur = 0;
-                output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
+                // output_file = new FileOutputStream(new File("C:/MINET/"+filename_));
+                output_file = new FileOutputStream(new File(
+                    path + "/" +filename_));
                 inputBytes = new byte[1024];
                 while (true) {
                     length = input_.read(inputBytes, 0, inputBytes.length);
