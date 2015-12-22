@@ -34,8 +34,6 @@ public class LoginUI extends JFrame {
 
         labelUsername = new JLabel("ip");
         inputUsername = new JTextField();
-        labelPassword = new JLabel("端口");
-        inputPassword = new JTextField();
         loginBtn = new JButton("登陆");
 
         initUI();
@@ -44,7 +42,7 @@ public class LoginUI extends JFrame {
     private void initUI() {
         GridBagConstraints cTop = new GridBagConstraints();
         cTop.weightx = 1;
-        cTop.weighty = 1;
+        cTop.weighty = 0.4;
         cTop.insets = new Insets(0, 0, 0, 0);
         cTop.fill = GridBagConstraints.BOTH;
         cTop.anchor = GridBagConstraints.CENTER;
@@ -89,29 +87,6 @@ public class LoginUI extends JFrame {
         inputUsername.setBackground(new Color(217, 247, 246));
         add(inputUsername, cUsrAndPwd);
 
-        // add empty label
-        cUsrAndPwd.gridx = 0;
-        cUsrAndPwd.gridy = 2;
-        cUsrAndPwd.gridwidth = 1;
-        cUsrAndPwd.gridheight = 1;
-        add(new JLabel(), cUsrAndPwd);
-
-        // add password label
-        cUsrAndPwd.gridx = 1;
-        cUsrAndPwd.gridy = 2;
-        cUsrAndPwd.gridwidth = 1;
-        cUsrAndPwd.gridheight = 1;
-        add(labelPassword, cUsrAndPwd);
-
-        // add password textfield        
-        cUsrAndPwd.gridx = 2;
-        cUsrAndPwd.gridy = 2;
-        cUsrAndPwd.gridwidth = 3;
-        cUsrAndPwd.gridheight = 1;
-        inputPassword.setOpaque(true);
-        inputPassword.setBackground(new Color(217, 247, 246));
-        add(inputPassword, cUsrAndPwd);
-
         GridBagConstraints cLogin = new GridBagConstraints();
         cLogin.weightx = 0;
         cLogin.weighty = 0;
@@ -142,8 +117,6 @@ public class LoginUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             loginPara.setFlag(false);
             loginPara.setIp(inputUsername.getText());
-            loginPara.setPortNum(Integer.parseInt(
-                inputPassword.getText().toString()));
             dispose();
         }
     }

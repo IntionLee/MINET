@@ -16,8 +16,7 @@ public class newClient {
         }
 
         // if login successfully, create a new client and chatroom UI
-        client = new Client(loginPara.getIp(),
-            loginPara.getPortNum());
+        client = new Client(loginPara.getIp(), 54321);
         ChatroomUI ui = new ChatroomUI(client);
 
         // keep detecting different kinds of messages
