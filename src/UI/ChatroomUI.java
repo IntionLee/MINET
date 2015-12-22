@@ -14,7 +14,7 @@ import java.io.*;
 import src.*;
 
 /**
- * provide the GUI of regist window
+ * provide the GUI of chatroom window
  *
  * @version 1.0 08 Dec 2015
  */
@@ -28,6 +28,7 @@ public class ChatroomUI extends JFrame implements ComponentListener,
     private JTextArea inputDialog;
     private JScrollPane scrollInputDialog;
     private JButton sendBtn;
+    private JButton sendFileBtn;
     private Client client;
 
     public ChatroomUI(Client client_) {
@@ -74,6 +75,7 @@ public class ChatroomUI extends JFrame implements ComponentListener,
         chatWindow = new JTextArea();
         inputDialog = new JTextArea();
         sendBtn = new JButton("发送");
+        sendFileBtn = new JButton("选择文件");
     }
 
     private void addHeader() {
@@ -165,7 +167,7 @@ public class ChatroomUI extends JFrame implements ComponentListener,
 
     private void addSendButton() {
         GridBagConstraints cButton = new GridBagConstraints();
-        cButton.weightx = 0;
+        cButton.weightx = 0.2;
         cButton.weighty = 0.025;
         cButton.insets = new Insets(10, 10, 10, 10);
         cButton.fill = GridBagConstraints.BOTH;
@@ -177,6 +179,14 @@ public class ChatroomUI extends JFrame implements ComponentListener,
         cButton.gridwidth = 1;
         cButton.gridheight = 1;
         add(sendBtn, cButton);
+
+        // add send file button
+        cButton.weightx = 0.2;
+        cButton.gridx = 5;
+        cButton.gridy = 7;
+        cButton.gridwidth = 1;
+        cButton.gridheight = 1;
+        add(sendFileBtn, cButton);
     }
 
     private void initUI() {
@@ -188,6 +198,7 @@ public class ChatroomUI extends JFrame implements ComponentListener,
 
         // add listener
         sendBtn.addActionListener(new sendBtnListener());
+        sendFileBtn.addActionListener(new sendFileBtnListener());
     }
 
     public void appendChatWindowText() {
@@ -286,6 +297,13 @@ public class ChatroomUI extends JFrame implements ComponentListener,
 
             // clean the inputDialog window
             inputDialog.setText("");
+        }
+    }
+
+    private class sendFileBtnListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new FileChooserUI(client, 0, "");
         }
     }
 }
